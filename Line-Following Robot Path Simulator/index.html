@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Line-Following Robot Simulator</title><link rel="stylesheet" href="../common.css"></head>
+<body>
+<h1>Line-Following Robot Path Simulator</h1>
+<p class="subtitle">A simulated 2-sensor robot follows a predefined curved track using simple proportional steering.</p>
+
+<div class="panel">
+  <div class="row">
+    <button id="run">Start</button>
+    <button id="reset" style="background:#20283c;color:var(--text)">Reset</button>
+    <div><label>Steering gain (Kp)</label><input type="range" id="kp" min="0.1" max="3" step="0.1" value="1"></div>
+  </div>
+  <canvas id="track" width="700" height="380" style="width:100%;background:#0a0e18;border:1px solid var(--border);border-radius:8px"></canvas>
+  <div id="status" style="color:var(--muted);margin-top:8px">Ready.</div>
+</div>
+
+<script>
+const canvas = document.getElementById('track');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// Predefined track as a parametric curve (a wavy S path)
+function trackPoint(t){ // t in [0,1]
+  const x = 50 + t*(W-100);
+  const y = H/2 + Math.sin(t*Math.PI*3)*90;
+  return {x,y};
+}
+function trackTangent(t){
+  const dt=0.001;
+  const p1 = trackPoint(Math.max(0,t-dt)), p2 = trackPoint(Math.min(1,t+dt));
+  const dx=p2.x-p1.x, dy=p2.y-p1.y;
+  const len = Math.hypot(dx,dy);
+  return {x:dx/len,y:dy/len};
+}
+
+function drawTrack(){
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = '#333d55'; ctx.lineWidth = 18; ctx.lineCap='round';
+  ctx.beginPath();
+  for(let t=0;t<=1;t+=0.01){ const p=trackPoint(t); t===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); }
+  ctx.stroke();
+  ctx.strokeStyle = '#f6ad55'; ctx.lineWidth=2; ctx.beginPath();
+  for(let t=0;t<=1;t+=0.01){ const p=trackPoint(t); t===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); }
+  ctx.stroke();
+}
+
+let robot = {t:0.001, offset:0, heading:0};
+let running = false, animId=null;
+
+function drawRobot(){
+  const center = trackPoint(robot.t);
+  const tan = trackTangent(robot.t);
+  const normal = {x:-tan.y, y:tan.x};
+  const rx = center.x + normal.x*robot.offset;
+  const ry = center.y + normal.y*robot.offset;
+  const heading = Math.atan2(tan.y,tan.x);
+
+  ctx.save();
+  ctx.translate(rx,ry); ctx.rotate(heading);
+  ctx.fillStyle = '#4fd1c5';
+  ctx.beginPath(); ctx.moveTo(14,0); ctx.lineTo(-10,8); ctx.lineTo(-10,-8); ctx.closePath(); ctx.fill();
+  // sensors
+  ctx.fillStyle = robot.offset > 3 ? '#f56565' : '#333';
+  ctx.beginPath(); ctx.arc(8,-10,3,0,7); ctx.fill();
+  ctx.fillStyle = robot.offset < -3 ? '#f56565' : '#333';
+  ctx.beginPath(); ctx.arc(8,10,3,0,7); ctx.fill();
+  ctx.restore();
+}
+
+function step(){
+  const Kp = parseFloat(document.getElementById('kp').value);
+  // simple correction: drift offset randomly a bit, controller pulls it back toward 0
+  robot.offset += (Math.random()-0.5)*4; // simulated sensor noise / disturbance
+  robot.offset -= Kp * robot.offset * 0.3; // proportional correction pulling back to line
+  robot.t += 0.0025;
+  if(robot.t >= 1){ running=false; document.getElementById('status').textContent='Finished track.'; cancelAnimationFrame(animId); return; }
+  document.getElementById('status').textContent = `Progress: ${(robot.t*100).toFixed(0)}% | Offset from line: ${robot.offset.toFixed(1)}px`;
+  drawTrack(); drawRobot();
+  animId = requestAnimationFrame(step);
+}
+
+document.getElementById('run').addEventListener('click', ()=>{ if(!running){ running=true; step(); } });
+document.getElementById('reset').addEventListener('click', ()=>{ cancelAnimationFrame(animId); running=false; robot={t:0.001,offset:0,heading:0}; drawTrack(); drawRobot(); document.getElementById('status').textContent='Ready.'; });
+
+drawTrack(); drawRobot();
+</script>
+</body></html>
