@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grid Movement Simulator</title><link rel="stylesheet" href="../common.css">
+<style>
+#grid{display:grid;background:#0f1420;border:1px solid var(--border);width:fit-content}
+.cell{width:32px;height:32px;border:1px solid #1b2334}
+.dot{background:var(--accent);border-radius:50%;width:22px;height:22px;margin:4px;box-shadow:0 0 10px var(--accent)}
+#status{margin-top:10px;color:var(--muted)}
+</style></head>
+<body>
+<h1>Robot Movement Simulator (grid)</h1>
+<p class="subtitle">Click the grid to focus, then use arrow keys (or the buttons) to move the robot dot.</p>
+
+<div class="panel">
+  <div class="row">
+    <button id="up">↑</button><button id="left">←</button><button id="down">↓</button><button id="right">→</button>
+    <button id="reset" style="background:#20283c;color:var(--text)">Reset</button>
+  </div>
+  <div id="grid" tabindex="0"></div>
+  <div id="status">Position: (0, 0) &nbsp;|&nbsp; Steps: 0</div>
+</div>
+
+<script>
+const SIZE = 12;
+const grid = document.getElementById('grid');
+grid.style.gridTemplateColumns = `repeat(${SIZE}, 32px)`;
+let pos = {x:0,y:0}, steps=0;
+
+function render(){
+  grid.innerHTML='';
+  for(let y=0;y<SIZE;y++){
+    for(let x=0;x<SIZE;x++){
+      const cell = document.createElement('div');
+      cell.className='cell';
+      if(x===pos.x && y===pos.y){
+        const dot = document.createElement('div');
+        dot.className='dot';
+        cell.appendChild(dot);
+      }
+      grid.appendChild(cell);
+    }
+  }
+  document.getElementById('status').textContent = `Position: (${pos.x}, ${pos.y}) | Steps: ${steps}`;
+}
+
+function move(dx,dy){
+  const nx = pos.x+dx, ny = pos.y+dy;
+  if(nx<0||nx>=SIZE||ny<0||ny>=SIZE) return;
+  pos.x=nx; pos.y=ny; steps++;
+  render();
+}
+
+grid.addEventListener('keydown', e=>{
+  const map = {ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0]};
+  if(map[e.key]){ e.preventDefault(); move(...map[e.key]); }
+});
+document.getElementById('up').addEventListener('click', ()=>move(0,-1));
+document.getElementById('down').addEventListener('click', ()=>move(0,1));
+document.getElementById('left').addEventListener('click', ()=>move(-1,0));
+document.getElementById('right').addEventListener('click', ()=>move(1,0));
+document.getElementById('reset').addEventListener('click', ()=>{ pos={x:0,y:0}; steps=0; render(); });
+
+grid.addEventListener('click', ()=>grid.focus());
+render();
+grid.focus();
+</script>
+</body></html>
