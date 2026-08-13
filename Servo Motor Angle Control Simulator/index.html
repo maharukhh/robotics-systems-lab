@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servo Angle Control</title><link rel="stylesheet" href="../common.css">
+<style>output{color:var(--accent);font-weight:700;font-size:1.2rem}
+input[type=range]{width:100%}
+.presets button{margin-right:8px;background:#20283c;color:var(--text)}
+</style></head>
+<body>
+<h1>Servo Motor Angle Control Simulator</h1>
+<p class="subtitle">Drag the slider (0°–180°) to rotate the simulated servo arm — also shows the equivalent PWM pulse width.</p>
+
+<div class="panel">
+  <label>Angle: <output id="angleOut">90</output>°</label>
+  <input type="range" id="angle" min="0" max="180" value="90">
+  <div class="presets" style="margin-top:10px">
+    <button data-a="0">0°</button><button data-a="45">45°</button><button data-a="90">90°</button><button data-a="135">135°</button><button data-a="180">180°</button>
+  </div>
+</div>
+
+<div class="panel" style="text-align:center">
+  <svg width="260" height="200" viewBox="0 0 260 200">
+    <rect x="90" y="150" width="80" height="30" rx="4" fill="#161d2e" stroke="#232b40"/>
+    <circle cx="130" cy="150" r="14" fill="#232b40"/>
+    <line id="arm" x1="130" y1="150" x2="130" y2="60" stroke="#4fd1c5" stroke-width="8" stroke-linecap="round" transform-origin="130 150"/>
+    <circle cx="130" cy="150" r="6" fill="#f6ad55"/>
+  </svg>
+  <div class="result" id="pulseInfo"></div>
+</div>
+
+<div class="panel">
+  <h4 style="margin-top:0">PWM signal (typical hobby servo: 1ms–2ms pulse @ 50Hz)</h4>
+  <canvas id="pwm" width="600" height="100" style="width:100%;background:#0a0e18;border-radius:6px"></canvas>
+</div>
+
+<script>
+const angle = document.getElementById('angle');
+const angleOut = document.getElementById('angleOut');
+const arm = document.getElementById('arm');
+const pulseInfo = document.getElementById('pulseInfo');
+const pwmCanvas = document.getElementById('pwm');
+const ctx = pwmCanvas.getContext('2d');
+
+function pulseWidthMs(a){ return 1 + (a/180)*1; } // 1ms at 0deg -> 2ms at 180deg
+
+function drawPWM(pulseMs){
+  const w = pwmCanvas.width = pwmCanvas.clientWidth;
+  const h = pwmCanvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle = '#4fd1c5'; ctx.lineWidth = 2;
+  const periodMs = 20; // 50Hz
+  const pxPerMs = w/periodMs;
+  const highPx = pulseMs*pxPerMs;
+  const baseY = h-20, highY = 20;
+  ctx.beginPath();
+  ctx.moveTo(0, baseY);
+  ctx.lineTo(0, highY);
+  ctx.lineTo(highPx, highY);
+  ctx.lineTo(highPx, baseY);
+  ctx.lineTo(w, baseY);
+  ctx.stroke();
+  ctx.fillStyle='#8b93a7'; ctx.font='11px sans-serif';
+  ctx.fillText(`${pulseMs.toFixed(2)}ms pulse`, 6, highY-6);
+  ctx.fillText('20ms period (50Hz)', w-140, baseY+16);
+}
+
+function update(){
+  const a = parseInt(angle.value);
+  angleOut.textContent = a;
+  arm.setAttribute('transform', `rotate(${a-90} 130 150)`);
+  const pulse = pulseWidthMs(a);
+  pulseInfo.textContent = `PWM pulse width ≈ ${pulse.toFixed(2)} ms`;
+  drawPWM(pulse);
+}
+
+angle.addEventListener('input', update);
+document.querySelectorAll('.presets button').forEach(b=>b.addEventListener('click', ()=>{ angle.value=b.dataset.a; update(); }));
+update();
+</script>
+</body></html>
