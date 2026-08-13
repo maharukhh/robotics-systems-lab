@@ -1,44 +1,72 @@
-# Web Dev Robotics
+# Robotics Systems Lab
 
-A collection of frontend simulators and visualizers exploring robotics and embedded-systems concepts — built with HTML, CSS, and JavaScript, focused on control theory, kinematics, sensor/actuator behavior, and pathfinding through interactive, hands-on simulations.
+A multi-stack collection of robotics and intelligent-systems projects — spanning path-planning and control algorithms in Python, and interactive front-end simulators built with vanilla HTML/CSS/JS. Built while studying Mechatronics, Robotics & Automation Engineering, this repo bridges algorithmic robotics work with hands-on, browser-based visualization of the same core concepts.
 
 ## Overview
-This repository demonstrates how core frontend skills — DOM manipulation, SVG/canvas rendering, event handling, and state management — can be used to visualize and simulate robotics and embedded-systems concepts normally taught through math and hardware. Each project is a self-contained, framework-free simulator, built to make abstract concepts (PID tuning, kinematics, control loops) tangible and interactive before working with real hardware or a robotics framework like ROS.
+
+Robotics work spans multiple layers — the algorithms that plan and control a robot's behavior, and the tools used to visualize, tune, and understand that behavior. This repo reflects that range on purpose: `python/` holds standalone algorithmic implementations (planning, control theory), while `web-simulators/` holds interactive, framework-free browser tools that make those same concepts (kinematics, PID tuning, sensor/actuator behavior) tangible without needing physical hardware or a full robotics framework like ROS.
 
 ## Projects
-✅ = completed and in the repo · unmarked = planned / not yet added
+
+### Python — Algorithms & Control
 
 | Project | Key Concepts |
 |---|---|
-| ✅Robot Arm Joint-Angle Form | SVG rendering, form-to-visual binding, forward kinematics |
-| ✅Grid Movement Simulator | Keyboard event handling, 2D coordinate state |
-| ✅Line-Following Path Simulator | Path/track modeling, sensor-following logic |
-| ✅Servo Angle Control | Slider input, real-time SVG rotation |
-| ✅Motor PWM Control | Duty-cycle math, real-time UI feedback |
-| PID Controller Visualizer | Control theory, live response plotting |
-| Sensor Threshold Alert UI | Mock sensor streams, conditional alert logic |
-|Sensor Data Logger | Data logging, CSV export |
-| Maze Solver Visualizer | BFS/DFS algorithms, step-through visualization |
-| Robot "Brain" Flowchart Builder | Drag-and-drop UI, sense→think→act architecture |
-| GPIO Pin Reference/Simulator | Interactive reference UI, Raspberry Pi pinout |
-| Inverse Kinematics Solver | 2-link arm IK, trigonometric solving |
-| Encoder/Odometry Simulator | Wheel encoder math, position estimation |
-| Kalman Filter Visualizer | Sensor fusion, noise reduction |
-| Robot State Machine Debugger | FSM design, transition logging |
-| Obstacle Avoidance Simulator | Raycasting, reactive navigation |
+| ✅ [A\* Path Planning](python/robotics_applications.py) | Grid-based search, occupancy grids, heuristic pathfinding |
+| ✅ [PID Path-Tracking Controller](python/robotics_applications.py) | Closed-loop control, unicycle-model kinematics, heading-error correction |
 
-*(Actively expanding as new simulators are added.)*
+Both are runnable standalone via:
+```bash
+python robotics_applications.py --task path_planning
+python robotics_applications.py --task pid_control
+```
+Each generates a saved visualization (`astar_path.png`, `pid_tracking.png`) and displays it interactively.
+
+### Web Simulators — Interactive Visualization
+
+| Project | Key Concepts |
+|---|---|
+| ✅ Robot Arm Joint-Angle Form | SVG rendering, form-to-visual binding, forward kinematics |
+| ✅ Grid Movement Simulator | Keyboard event handling, 2D coordinate state |
+| ✅ Line-Following Path Simulator | Path/track modeling, sensor-following logic |
+| ✅ Servo Angle Control | Slider input, real-time SVG rotation |
+| ✅ Motor PWM / Speed Control | Duty-cycle math, real-time UI feedback |
+| ⬜ PID Controller Visualizer | Control theory, live response plotting |
+| ⬜ Maze Solver Visualizer | BFS/DFS algorithms, step-through visualization |
+| ⬜ Sensor Threshold Alert UI | Mock sensor streams, conditional alert logic |
+| ⬜ Inverse Kinematics Solver | 2-link arm IK, trigonometric solving |
+| ⬜ Obstacle Avoidance Simulator | Raycasting, reactive navigation |
+
+*(✅ = completed and in the repo · ⬜ = planned)*
 
 ## Tech Stack
-**Languages:** HTML5, CSS3, JavaScript (ES6+)
-**Concepts:** SVG/Canvas Rendering, Control Theory (PID), Kinematics, Finite State Machines, Pathfinding Algorithms, Sensor/Actuator Simulation, Event-Driven Programming
+
+**Languages:** Python (NumPy, Matplotlib), HTML5, CSS3, JavaScript (ES6+)
+**Concepts:** A\* Search, PID / Control Theory, Forward & Inverse Kinematics, Finite State Machines, Sensor/Actuator Simulation, SVG/Canvas Rendering, Event-Driven Programming
+
+## Repository Structure
+
+```
+robotics-systems-lab/
+├── python/
+│   └── robotics_applications.py     # A* planning + PID control demos
+├── web-simulators/
+│   ├── robot-arm-joint-angle/
+│   ├── grid-movement-simulator/
+│   ├── line-following-path-simulator/
+│   ├── servo-angle-control/
+│   └── motor-pwm-control/
+└── README.md
+```
 
 ## Purpose
-Built as part of a broader skill set spanning AI/ML, robotics, and full-stack development — this repo bridges frontend engineering and robotics coursework by turning control-theory and kinematics concepts into things you can see, tune, and interact with in a browser.
+
+This repo consolidates robotics coursework and self-driven projects into one place — showing both the algorithmic foundations (search, control theory) and the ability to build clear, interactive tools around them. It's intended as a working portfolio: a single, coherent view of robotics-domain work across the stacks it actually gets built in.
 
 ## Status
-🟢 Active — new simulators added regularly.
+
+🟢 Active — new algorithms and simulators added regularly.
 
 ## Author
-**Mahrukh**
-Robotics and Intelligent Systems Student
+
+**Mahrukh** — Robotics and Intelligent Systems Student
