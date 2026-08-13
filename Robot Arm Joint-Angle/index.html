@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mahrukh's Robot Arm Joint-Angle Visualizer</title><link rel="stylesheet" href="../common.css">
+<style>.wrap{display:flex;gap:24px;flex-wrap:wrap}.controls{min-width:260px}
+.sliderRow{margin-bottom:14px}
+.sliderRow output{color:var(--accent);font-weight:700}
+input[type=range]{width:100%}
+</style></head>
+<body>
+<h1>Robot Arm Joint-Angle Input Form</h1>
+<p class="subtitle">A simple 3-DOF planar arm (base, shoulder, elbow) </p>
+
+<div class="wrap">
+  <div class="panel controls">
+    <div class="sliderRow"><label>Joint 1 — Base rotation: <output id="oJ1">0°</output></label>
+      <input type="range" id="j1" min="-90" max="90" value="0"></div>
+    <div class="sliderRow"><label>Joint 2 — Shoulder: <output id="oJ2">45°</output></label>
+      <input type="range" id="j2" min="-90" max="90" value="45"></div>
+    <div class="sliderRow"><label>Joint 3 — Elbow: <output id="oJ3">-45°</output></label>
+      <input type="range" id="j3" min="-150" max="150" value="-45"></div>
+    <div class="sliderRow"><label>Link 1 length: <output id="oL1">80</output></label>
+      <input type="range" id="l1" min="40" max="120" value="80"></div>
+    <div class="sliderRow"><label>Link 2 length: <output id="oL2">70</output></label>
+      <input type="range" id="l2" min="30" max="120" value="70"></div>
+    <button id="reset">Reset</button>
+    <p style="color:var(--muted);font-size:.85rem">End-effector: (<span id="eeX">--</span>, <span id="eeY">--</span>)</p>
+  </div>
+
+  <div class="panel" style="flex:1;min-width:320px">
+    <svg id="arm" width="100%" height="380" viewBox="0 0 400 380"></svg>
+  </div>
+</div>
+
+<script>
+const ids = ['j1','j2','j3','l1','l2'];
+const els = {}; ids.forEach(id=>els[id]=document.getElementById(id));
+const outs = {j1:'oJ1',j2:'oJ2',j3:'oJ3',l1:'oL1',l2:'oL2'};
+
+function deg2rad(d){return d*Math.PI/180;}
+
+function draw(){
+  const j1 = parseFloat(els.j1.value);
+  const j2 = parseFloat(els.j2.value);
+  const j3 = parseFloat(els.j3.value);
+  const l1 = parseFloat(els.l1.value);
+  const l2 = parseFloat(els.l2.value);
+
+  ids.forEach(id=>{
+    const suffix = id[0]==='j' ? '°' : '';
+    document.getElementById(outs[id]).textContent = els[id].value + suffix;
+  });
+
+  // base at bottom center, joint2 measured from vertical, joint3 relative to link1
+  const baseX = 200, baseY = 340;
+  const a1 = deg2rad(90 - j2); // shoulder angle from horizontal
+  const elbowX = baseX + l1*Math.cos(a1);
+  const elbowY = baseY - l1*Math.sin(a1);
+  const a2 = a1 + deg2rad(j3);
+  const eeX = elbowX + l2*Math.cos(a2);
+  const eeY = elbowY - l2*Math.sin(a2);
+
+  // apply base rotation j1 visually by shifting elbow/ee horizontally (simple 2.5D illusion)
+  const skew = deg2rad(j1);
+  const shX = (baseX - elbowX)*Math.sin(skew)*0.3;
+
+  document.getElementById('eeX').textContent = eeX.toFixed(1);
+  document.getElementById('eeY').textContent = (baseY-eeY).toFixed(1);
+
+  const svg = document.getElementById('arm');
+  svg.innerHTML = `
+    <rect x="0" y="340" width="400" height="6" fill="#232b40"/>
+    <circle cx="${baseX}" cy="${baseY}" r="14" fill="#161d2e" stroke="#4fd1c5" stroke-width="2"/>
+    <line x1="${baseX}" y1="${baseY}" x2="${elbowX+shX}" y2="${elbowY}" stroke="#4fd1c5" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="${elbowX+shX}" cy="${elbowY}" r="10" fill="#f6ad55"/>
+    <line x1="${elbowX+shX}" y1="${elbowY}" x2="${eeX+shX}" y2="${eeY}" stroke="#63b3ed" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="${eeX+shX}" cy="${eeY}" r="9" fill="#48bb78"/>
+    <text x="20" y="30" fill="#8b93a7" font-size="12">Base rotation shown as horizontal skew (top-down illusion)</text>
+  `;
+}
+
+ids.forEach(id=>els[id].addEventListener('input', draw));
+document.getElementById('reset').addEventListener('click', ()=>{
+  els.j1.value=0; els.j2.value=45; els.j3.value=-45; els.l1.value=80; els.l2.value=70; draw();
+});
+draw();
+</script>
+</body></html>
