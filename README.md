@@ -10,9 +10,9 @@ This repository demonstrates how core frontend skills — DOM manipulation, SVG/
 
 | Project | Key Concepts |
 |---|---|
-| Robot Arm Joint-Angle Form | SVG rendering, form-to-visual binding, forward kinematics |
-| Grid Movement Simulator | Keyboard event handling, 2D coordinate state |
-| Line-Following Path Simulator | Path/track modeling, sensor-following logic |
+| ✅Robot Arm Joint-Angle Form | SVG rendering, form-to-visual binding, forward kinematics |
+| ✅Grid Movement Simulator | Keyboard event handling, 2D coordinate state |
+| ✅Line-Following Path Simulator | Path/track modeling, sensor-following logic |
 | Servo Angle Control | Slider input, real-time SVG rotation |
 | Motor PWM Control | Duty-cycle math, real-time UI feedback |
 | PID Controller Visualizer | Control theory, live response plotting |
