@@ -1,6 +1,6 @@
 # Boids Flocking Simulation
 
-Classic multi-agent emergent-behavior algorithm (Craig Reynolds, 1987): each agent follows three simple local rules, and complex, realistic flocking behavior emerges with no central coordinator — a core principle behind real swarm-robotics systems.
+A Python-based multi-agent swarm simulation inspired by Craig Reynolds' classic Boids algorithm. It demonstrates how simple local rules can produce coordinated flocking behavior without a central controller.
 
 ## Run it
 
@@ -12,8 +12,12 @@ Prints a final "flock alignment score" (0 = random headings, 1 = perfectly align
 2. **Alignment** — steer to match the average heading of nearby agents.
 3. **Cohesion** — steer toward the average position (centroid) of nearby agents.
 
-No agent has any global knowledge of the flock — each only reacts to neighbors within its local perception radius. The flocking behavior that emerges is a good illustration of why swarm robotics can achieve complex group behavior from simple, fully decentralized individual rules.
+No central coordinator controls the flock. Complex group behavior emerges from simple local interactions, making this a practical example of swarm robotics and multi-agent systems.
 
 ## Dependencies
 
 `numpy`, `matplotlib`
+
+Key Concepts
+
+Swarm Robotics • Multi-Agent Systems • Emergent Behavior • Decentralized Control • Flocking Algorithms • Agent-Based Simulation
