@@ -1,0 +1,38 @@
+# 2-Link Robotic Arm — Forward & Inverse Kinematics
+
+A Python-based robotics project that implements **Forward Kinematics (FK)**, **Inverse Kinematics (IK)**, and **workspace visualization** for a planar 2-link robotic arm.
+
+## 🚀 Features
+
+* **Forward Kinematics** — Calculates the end-effector position from joint angles.
+* **Inverse Kinematics** — Calculates joint angles for a given target position using the Law of Cosines.
+* **Workspace Analysis** — Visualizes the complete reachable area of the robotic arm.
+
+## ▶️ Run
+
+```bash
+python arm_kinematics.py --task fk
+python arm_kinematics.py --task ik
+python arm_kinematics.py --task workspace
+```
+
+* `fk` → Joint angles → End-effector position
+* `ik` → Target position → Joint angles
+* `workspace` → Visualizes the reachable workspace
+
+## 🧠 How It Works
+
+**Forward Kinematics** uses trigonometry to determine the elbow and end-effector positions from `θ1`, `θ2`, `L1`, and `L2`.
+
+**Inverse Kinematics** works in the opposite direction, using the target `(x, y)` position and the **Law of Cosines** to calculate the required joint angles.
+
+## 📦 Dependencies
+
+* Python 3.x
+* NumPy
+* Matplotlib
+
+## 🎯 Learning Objectives
+
+This project demonstrates fundamental robotics concepts including **kinematics, trigonometry, joint-space control, Cartesian coordinates, inverse solutions, and workspace analysis**.
+
