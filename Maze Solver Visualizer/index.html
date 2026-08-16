@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maze Solver Visualizer (BFS/DFS)</title><link rel="stylesheet" href="../common.css">
+<style>
+#maze{display:grid;width:fit-content;border:1px solid var(--border)}
+.cell{width:26px;height:26px;background:#161d2e;border:1px solid #1b2334}
+.wall{background:#0a0e18}
+.start{background:var(--good)}
+.end{background:var(--danger)}
+.visited{background:#2b3a5c}
+.path{background:var(--accent)}
+</style></head>
+<body>
+<h1>Maze Solver Visualizer</h1>
+<p class="subtitle">Click cells to toggle walls, then run BFS or DFS from start (green) to end (red).</p>
+
+<div class="panel">
+  <div class="row">
+    <button id="bfs">Run BFS</button>
+    <button id="dfs">Run DFS</button>
+    <button id="clearWalls" style="background:#20283c;color:var(--text)">Clear walls</button>
+    <button id="randomWalls" style="background:#20283c;color:var(--text)">Random walls</button>
+  </div>
+  <div id="maze"></div>
+  <div id="status" style="color:var(--muted);margin-top:8px">Click cells to add/remove walls.</div>
+</div>
+
+<script>
+const ROWS=15, COLS=22;
+const mazeEl = document.getElementById('maze');
+mazeEl.style.gridTemplateColumns = `repeat(${COLS}, 26px)`;
+let grid = Array.from({length:ROWS},()=>Array(COLS).fill(0)); // 0 open,1 wall
+const start = {r:1,c:1}, end = {r:ROWS-2,c:COLS-2};
+let cellEls = [];
+
+function render(highlight={visited:[],path:[]}){
+  mazeEl.innerHTML='';
+  cellEls = [];
+  for(let r=0;r<ROWS;r++){
+    const rowEls=[];
+    for(let c=0;c<COLS;c++){
+      const d = document.createElement('div');
+      d.className='cell';
+      if(grid[r][c]===1) d.classList.add('wall');
+      if(r===start.r&&c===start.c) d.classList.add('start');
+      if(r===end.r&&c===end.c) d.classList.add('end');
+      if(highlight.visited.some(p=>p.r===r&&p.c===c) && !(r===start.r&&c===start.c) && !(r===end.r&&c===end.c)) d.classList.add('visited');
+      if(highlight.path.some(p=>p.r===r&&p.c===c) && !(r===start.r&&c===start.c) && !(r===end.r&&c===end.c)) d.classList.add('path');
+      d.addEventListener('click', ()=>{
+        if((r===start.r&&c===start.c)||(r===end.r&&c===end.c)) return;
+        grid[r][c] = grid[r][c]?0:1;
+        render();
+      });
+      mazeEl.appendChild(d);
+      rowEls.push(d);
+    }
+    cellEls.push(rowEls);
+  }
+}
+
+function neighbors(r,c){
+  return [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([nr,nc])=>nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&grid[nr][nc]===0);
+}
+
+async function solve(algo){
+  const visited = new Set();
+  const cameFrom = {};
+  const key = (r,c)=>r+','+c;
+  const structure = [{r:start.r,c:start.c}];
+  visited.add(key(start.r,start.c));
+  const visitedOrder = [];
+  let found = false;
+
+  while(structure.length){
+    const cur = algo==='bfs' ? structure.shift() : structure.pop();
+    visitedOrder.push(cur);
+    if(cur.r===end.r && cur.c===end.c){ found=true; break; }
+    for(const [nr,nc] of neighbors(cur.r,cur.c)){
+      if(!visited.has(key(nr,nc))){
+        visited.add(key(nr,nc));
+        cameFrom[key(nr,nc)] = cur;
+        structure.push({r:nr,c:nc});
+      }
+    }
+  }
+
+  // animate visited
+  for(let i=0;i<visitedOrder.length;i+=3){
+    render({visited: visitedOrder.slice(0,i+3), path:[]});
+    await new Promise(res=>setTimeout(res,10));
+  }
+
+  if(found){
+    let path=[]; let cur = {r:end.r,c:end.c};
+    while(cur && !(cur.r===start.r&&cur.c===start.c)){
+      path.push(cur);
+      cur = cameFrom[key(cur.r,cur.c)];
+    }
+    render({visited:visitedOrder, path});
+    document.getElementById('status').textContent = `${algo.toUpperCase()} found path: ${path.length} steps, visited ${visitedOrder.length} cells.`;
+  } else {
+    render({visited:visitedOrder, path:[]});
+    document.getElementById('status').textContent = `${algo.toUpperCase()}: no path found. Visited ${visitedOrder.length} cells.`;
+  }
+}
+
+document.getElementById('bfs').addEventListener('click', ()=>solve('bfs'));
+document.getElementById('dfs').addEventListener('click', ()=>solve('dfs'));
+document.getElementById('clearWalls').addEventListener('click', ()=>{ grid=Array.from({length:ROWS},()=>Array(COLS).fill(0)); render(); });
+document.getElementById('randomWalls').addEventListener('click', ()=>{
+  grid = Array.from({length:ROWS},()=>Array(COLS).fill(0).map(()=>Math.random()<0.25?1:0));
+  grid[start.r][start.c]=0; grid[end.r][end.c]=0;
+  render();
+});
+
+render();
+</script>
+</body></html>
