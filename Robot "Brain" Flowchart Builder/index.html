@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robot Brain Flowchart Builder</title><link rel="stylesheet" href="../common.css">
+<style>
+.palette{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.block{padding:10px 16px;border-radius:8px;cursor:grab;font-weight:600;user-select:none}
+.block.sense{background:#2b5fd9}
+.block.think{background:#f6ad55;color:#0f1420}
+.block.act{background:#48bb78;color:#0f1420}
+#canvas{min-height:340px;border:2px dashed var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.placed{padding:10px 16px;border-radius:8px;font-weight:600;display:flex;align-items:center;gap:10px;position:relative}
+.placed .remove{background:#0006;border:none;color:#fff;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:.7rem;line-height:0}
+.arrow{color:var(--muted);align-self:center}
+</style></head>
+<body>
+<h1>Robot "Brain" Flowchart Builder</h1>
+<p class="subtitle">Drag Sense / Think / Act blocks into the canvas to build a simple robot control loop.</p>
+
+<div class="panel">
+  <div class="palette">
+    <div class="block sense" draggable="true" data-type="sense">🔵 Sense (e.g. read distance sensor)</div>
+    <div class="block think" draggable="true" data-type="think">🟠 Think (e.g. if distance &lt; 10cm)</div>
+    <div class="block act" draggable="true" data-type="act">🟢 Act (e.g. turn motor left)</div>
+  </div>
+  <div id="canvas"></div>
+  <div class="row" style="margin-top:12px">
+    <button id="clearBtn" style="background:#20283c;color:var(--text)">Clear</button>
+    <button id="loopBtn">Add loop-back arrow ↻</button>
+  </div>
+</div>
+
+<footer>Click a placed block to edit its label. Drag from the palette to add more.</footer>
+
+<script>
+const canvas = document.getElementById('canvas');
+const colors = { sense:'#2b5fd9', think:'#f6ad55', act:'#48bb78' };
+const textColors = { sense:'#fff', think:'#0f1420', act:'#0f1420' };
+const defaultLabels = { sense:'Sense: read sensor', think:'Think: decision logic', act:'Act: drive motors' };
+let counter = 0;
+
+document.querySelectorAll('.block[draggable]').forEach(b=>{
+  b.addEventListener('dragstart', e=> e.dataTransfer.setData('type', b.dataset.type));
+});
+canvas.addEventListener('dragover', e=> e.preventDefault());
+canvas.addEventListener('drop', e=>{
+  e.preventDefault();
+  const type = e.dataTransfer.getData('type');
+  if(type) addBlock(type);
+});
+
+function addBlock(type){
+  if(canvas.children.length > 0){
+    const arrow = document.createElement('div');
+    arrow.className='arrow'; arrow.textContent='↓';
+    canvas.appendChild(arrow);
+  }
+  const el = document.createElement('div');
+  el.className='placed';
+  el.style.background = colors[type];
+  el.style.color = textColors[type];
+  const labelSpan = document.createElement('span');
+  labelSpan.textContent = defaultLabels[type];
+  labelSpan.contentEditable = true;
+  labelSpan.addEventListener('blur', ()=> labelSpan.textContent = labelSpan.textContent.trim() || defaultLabels[type]);
+  const rm = document.createElement('button');
+  rm.className='remove'; rm.textContent='×';
+  rm.addEventListener('click', ()=>{
+    const prevArrow = el.previousElementSibling;
+    if(prevArrow && prevArrow.classList.contains('arrow')) prevArrow.remove();
+    el.remove();
+  });
+  el.appendChild(labelSpan);
+  el.appendChild(rm);
+  canvas.appendChild(el);
+}
+
+document.getElementById('clearBtn').addEventListener('click', ()=> canvas.innerHTML='');
+document.getElementById('loopBtn').addEventListener('click', ()=>{
+  const arrow = document.createElement('div');
+  arrow.className='arrow'; arrow.textContent='↻ back to Sense (repeat loop)';
+  canvas.appendChild(arrow);
+});
+
+// starter blocks
+addBlock('sense'); addBlock('think'); addBlock('act');
+</script>
+</body></html>
