@@ -5,13 +5,8 @@ Computes both directions of the kinematics problem for a planar 2-link
 arm: forward kinematics (joint angles -> end-effector position) and
 inverse kinematics (target position -> joint angles, via closed-form
 trigonometric solution). Also sweeps the arm's full reachable workspace.
-Companion piece to the "Robot Arm Joint-Angle" web simulator in this repo.
+Companion piece to the "Robot Arm Joint-Angle" web simulator in this repo
 
-Usage
------
-    python arm_kinematics.py --task fk
-    python arm_kinematics.py --task ik
-    python arm_kinematics.py --task workspace
 """
 
 import argparse
