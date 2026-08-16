@@ -12,8 +12,11 @@ Robotics work spans multiple layers — the algorithms that plan and control a r
 
 | Project | Key Concepts |
 |---|---|
-| ✅ [A\* Path Planning](python/robotics_applications.py) | Grid-based search, occupancy grids, heuristic pathfinding |
-| ✅ [PID Path-Tracking Controller](python/robotics_applications.py) | Closed-loop control, unicycle-model kinematics, heading-error correction |
+| [Robotics & Intelligent Systems Applications] | A* path planning, PID path tracking, robot motion |
+| [2-Link Robotic Arm] | Forward kinematics, inverse kinematics, workspace analysis |
+| [Bang-Bang vs PID Control] | Feedback control, PID, on-off control, system response |
+| [Boids Flocking Simulation] | Swarm robotics, multi-agent systems, emergent behavior |
+
 
 Both are runnable standalone via:
 ```bash
@@ -26,36 +29,36 @@ Each generates a saved visualization (`astar_path.png`, `pid_tracking.png`) and 
 
 | Project | Key Concepts |
 |---|---|
-| ✅ Robot Arm Joint-Angle Form | SVG rendering, form-to-visual binding, forward kinematics |
-| ✅ Grid Movement Simulator | Keyboard event handling, 2D coordinate state |
-| ✅ Line-Following Path Simulator | Path/track modeling, sensor-following logic |
-| ✅ Servo Angle Control | Slider input, real-time SVG rotation |
-| ✅ Motor PWM / Speed Control | Duty-cycle math, real-time UI feedback |
-| ⬜ PID Controller Visualizer | Control theory, live response plotting |
-| ⬜ Maze Solver Visualizer | BFS/DFS algorithms, step-through visualization |
-| ⬜ Sensor Threshold Alert UI | Mock sensor streams, conditional alert logic |
-| ⬜ Inverse Kinematics Solver | 2-link arm IK, trigonometric solving |
-| ⬜ Obstacle Avoidance Simulator | Raycasting, reactive navigation |
+| [Robot Arm Joint-Angle] | SVG rendering, joint angles, forward kinematics |
+| [Robot Movement Simulator (Grid)] | Keyboard controls, 2D coordinates, robot movement |
+| [Line-Following Robot Path Simulator] | Path modeling, sensor-following logic |
+| [Servo Motor Angle Control Simulator] | Slider controls, servo angles, SVG animation |
+| [Motor Speed Control UI] | PWM, duty cycle, motor speed simulation |
+| [Basic PID Controller Visualizer] | PID tuning, first-order plant, response visualization |
+| [Sensor Threshold Alert UI] | Ultrasonic sensor simulation, threshold alerts, live gauge |
 
-*(✅ = completed and in the repo · ⬜ = planned)*
 
 ## Tech Stack
 
-**Languages:** Python (NumPy, Matplotlib), HTML5, CSS3, JavaScript (ES6+)
-**Concepts:** A\* Search, PID / Control Theory, Forward & Inverse Kinematics, Finite State Machines, Sensor/Actuator Simulation, SVG/Canvas Rendering, Event-Driven Programming
+**Python:** NumPy, Matplotlib  
+**Web:** HTML5, CSS3, JavaScript (ES6+)  
+**Robotics Concepts:** A* Search, PID Control, Forward & Inverse Kinematics, Motion Planning, Flocking Algorithms, Sensor Simulation, Motor/Servo Control, Feedback Systems
 
 ## Repository Structure
 
-```
+```text
 robotics-systems-lab/
-├── python/
-│   └── robotics_applications.py     # A* planning + PID control demos
-├── web-simulators/
-│   ├── robot-arm-joint-angle/
-│   ├── grid-movement-simulator/
-│   ├── line-following-path-simulator/
-│   ├── servo-angle-control/
-│   └── motor-pwm-control/
+├── Robotics & Intelligent Systems Applications/
+├── 2-Link Robotic Arm/
+├── Bang-Bang vs PID Control/
+├── Boids Flocking Simulation/
+├── Basic PID Controller Visualizer/
+├── Robot Arm Joint-Angle/
+├── Robot Movement Simulator (Grid)/
+├── Line-Following Robot Path Simulator/
+├── Servo Motor Angle Control Simulator/
+├── Motor Speed Control UI/
+├── Sensor Threshold Alert UI/
 └── README.md
 ```
 
