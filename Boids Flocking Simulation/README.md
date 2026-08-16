@@ -18,6 +18,6 @@ No central coordinator controls the flock. Complex group behavior emerges from s
 
 `numpy`, `matplotlib`
 
-Key Concepts
+## Key Concepts
 
 Swarm Robotics • Multi-Agent Systems • Emergent Behavior • Decentralized Control • Flocking Algorithms • Agent-Based Simulation
