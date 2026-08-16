@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PID Controller Visualizer</title><link rel="stylesheet" href="../common.css">
+<style>output{color:var(--accent);font-weight:700}canvas{width:100%;background:#0f1420;border:1px solid var(--border);border-radius:8px}</style>
+</head>
+<body>
+<h1>Basic PID Controller Visualizer</h1>
+<p class="subtitle">Simulates a first-order plant controlled by a PID loop responding to a step setpoint.</p>
+
+<div class="panel">
+  <div class="row">
+    <div><label>P gain: <output id="oP">1.0</output></label><input type="range" id="kp" min="0" max="5" step="0.05" value="1"></div>
+    <div><label>I gain: <output id="oI">0.2</output></label><input type="range" id="ki" min="0" max="3" step="0.02" value="0.2"></div>
+    <div><label>D gain: <output id="oD">0.1</output></label><input type="range" id="kd" min="0" max="2" step="0.02" value="0.1"></div>
+    <div><label>Setpoint: <output id="oSP">50</output></label><input type="range" id="sp" min="0" max="100" step="1" value="50"></div>
+  </div>
+  <div class="row">
+    <button id="run">Run simulation</button>
+    <div style="color:var(--muted);font-size:.85rem;align-self:center">Plant model: simple first-order lag (like motor speed or temperature).</div>
+  </div>
+</div>
+
+<div class="panel"><canvas id="chart" height="320"></canvas></div>
+
+<script>
+const kp=document.getElementById('kp'), ki=document.getElementById('ki'), kd=document.getElementById('kd'), sp=document.getElementById('sp');
+const oP=document.getElementById('oP'), oI=document.getElementById('oI'), oD=document.getElementById('oD'), oSP=document.getElementById('oSP');
+[[kp,oP],[ki,oI],[kd,oD],[sp,oSP]].forEach(([inp,out])=>inp.addEventListener('input',()=>{out.textContent=inp.value; }));
+
+function simulate(){
+  const Kp=parseFloat(kp.value), Ki=parseFloat(ki.value), Kd=parseFloat(kd.value), SP=parseFloat(sp.value);
+  const dt = 0.1, steps = 200;
+  let pv = 0, integral = 0, prevError = 0;
+  const tau = 8; // plant time constant
+  const data = [];
+  for(let t=0;t<steps;t++){
+    const error = SP - pv;
+    integral += error*dt;
+    const derivative = (error - prevError)/dt;
+    const output = Kp*error + Ki*integral + Kd*derivative;
+    prevError = error;
+    // first-order plant response to control output
+    pv += (dt/tau) * (output - pv);
+    data.push(pv);
+  }
+  return data;
+}
+
+function drawChart(data, setpoint){
+  const canvas = document.getElementById('chart');
+  const w = canvas.width = canvas.clientWidth;
+  const h = canvas.height = 320;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,w,h);
+  const maxV = Math.max(setpoint*1.5, ...data, 10);
+  const minV = Math.min(0, ...data);
+  const range = maxV-minV;
+
+  // grid
+  ctx.strokeStyle = '#232b40'; ctx.lineWidth=1;
+  for(let g=0; g<=4; g++){ const y = h - (g/4)*h; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+
+  // setpoint line
+  const spY = h - ((setpoint-minV)/range)*h;
+  ctx.strokeStyle = '#f6ad55'; ctx.setLineDash([6,4]); ctx.beginPath(); ctx.moveTo(0,spY); ctx.lineTo(w,spY); ctx.stroke(); ctx.setLineDash([]);
+
+  // response curve
+  ctx.strokeStyle = '#4fd1c5'; ctx.lineWidth=2.5; ctx.beginPath();
+  data.forEach((v,i)=>{
+    const x = (i/(data.length-1))*w;
+    const y = h - ((v-minV)/range)*h;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = '#f6ad55'; ctx.font='12px sans-serif';
+  ctx.fillText('Setpoint = '+setpoint, 10, spY-6);
+  ctx.fillStyle = '#4fd1c5';
+  ctx.fillText('Process value', 10, 16);
+}
+
+function run(){
+  const data = simulate();
+  drawChart(data, parseFloat(sp.value));
+}
+
+document.getElementById('run').addEventListener('click', run);
+[kp,ki,kd,sp].forEach(el=>el.addEventListener('input', run));
+run();
+</script>
+</body></html>
