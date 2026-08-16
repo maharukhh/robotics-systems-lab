@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sensor Threshold Alert UI</title><link rel="stylesheet" href="../common.css">
+<style>
+#gauge{width:220px;height:220px;border-radius:50%;background:conic-gradient(var(--good) 0deg,var(--good) var(--goodDeg,180deg),var(--danger) var(--goodDeg,180deg) 360deg);display:flex;align-items:center;justify-content:center;margin:0 auto;position:relative}
+#gaugeInner{width:170px;height:170px;background:var(--bg);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.alertBanner{padding:12px 16px;border-radius:8px;font-weight:700;text-align:center;margin-top:16px}
+.alertBanner.ok{background:#123321;color:var(--good)}
+.alertBanner.alert{background:#3a1414;color:var(--danger);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+#log{font-family:monospace;font-size:.8rem;color:var(--muted);max-height:140px;overflow:auto}
+</style></head>
+<body>
+<h1>Sensor Threshold Alert (mock ultrasonic distance)</h1>
+<p class="subtitle">Simulated distance sensor triggers an alert when an object gets too close.</p>
+
+<div class="panel" style="max-width:500px;margin:0 auto">
+  <div id="gauge"><div id="gaugeInner">
+    <div style="font-size:2rem;font-weight:700" id="distText">--</div>
+    <div style="color:var(--muted)">cm</div>
+  </div></div>
+  <div class="alertBanner ok" id="banner">Clear</div>
+
+  <div class="row" style="margin-top:16px">
+    <div><label>Alert threshold (cm)</label><input type="range" id="thresh" min="5" max="80" value="20"><span id="threshVal">20</span></div>
+  </div>
+  <div class="row">
+    <button id="toggle">Pause</button>
+  </div>
+</div>
+
+<div class="panel"><h4 style="margin-top:0">Event log</h4><div id="log"></div></div>
+
+<script>
+let dist = 100;
+let running = true;
+const log = document.getElementById('log');
+let lastAlertState = false;
+
+function tick(){
+  dist += (Math.random()-0.55)*12;
+  dist = Math.max(2, Math.min(150, dist));
+  const threshold = parseInt(document.getElementById('thresh').value);
+  document.getElementById('threshVal').textContent = threshold;
+  document.getElementById('distText').textContent = dist.toFixed(0);
+
+  const isAlert = dist < threshold;
+  const banner = document.getElementById('banner');
+  const gauge = document.getElementById('gauge');
+  const pct = Math.min(100, (dist/150)*100);
+  gauge.style.setProperty('--goodDeg', (pct*3.6)+'deg');
+
+  if(isAlert){
+    banner.textContent = `⚠ OBJECT TOO CLOSE (${dist.toFixed(0)}cm < ${threshold}cm)`;
+    banner.className = 'alertBanner alert';
+  } else {
+    banner.textContent = 'Clear';
+    banner.className = 'alertBanner ok';
+  }
+
+  if(isAlert !== lastAlertState){
+    const entry = document.createElement('div');
+    const time = new Date().toLocaleTimeString();
+    entry.textContent = `[${time}] ${isAlert ? 'ALERT triggered' : 'Cleared'} — distance ${dist.toFixed(0)}cm`;
+    log.prepend(entry);
+    lastAlertState = isAlert;
+  }
+}
+
+document.getElementById('toggle').addEventListener('click', e=>{
+  running = !running;
+  e.target.textContent = running ? 'Pause' : 'Resume';
+});
+setInterval(()=>{ if(running) tick(); }, 400);
+tick();
+</script>
+</body></html>
