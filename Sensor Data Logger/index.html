@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sensor Data Logger</title><link rel="stylesheet" href="../common.css">
+<style>table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);position:sticky;top:0;background:var(--panel)}
+#logTable{max-height:340px;overflow:auto;display:block}
+</style></head>
+<body>
+<h1>Sensor Data Logger (mock, downloadable CSV)</h1>
+<p class="subtitle">Logs simulated temperature + distance readings on an interval; export as CSV.</p>
+
+<div class="panel">
+  <div class="row">
+    <button id="startLog">Start logging</button>
+    <button id="stopLog" style="background:#20283c;color:var(--text)">Stop</button>
+    <button id="download">Download CSV</button>
+    <button id="clearLog" style="background:#20283c;color:var(--text)">Clear</button>
+    <div><label>Interval (ms)</label><input id="interval" type="number" value="1000" min="200"></div>
+  </div>
+  <div id="status" style="color:var(--muted)">Not logging.</div>
+</div>
+
+<div class="panel">
+  <div id="logTable">
+    <table>
+      <thead><tr><th>#</th><th>Timestamp</th><th>Temp (°C)</th><th>Distance (cm)</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+let logging = false, timer = null;
+let data = [];
+let temp = 24, dist = 60;
+
+function tick(){
+  temp += (Math.random()-0.5)*2;
+  dist += (Math.random()-0.5)*10;
+  temp = Math.max(10, Math.min(45, temp));
+  dist = Math.max(2, Math.min(200, dist));
+  const row = { n: data.length+1, ts: new Date().toISOString(), temp: temp.toFixed(2), dist: dist.toFixed(1) };
+  data.push(row);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${row.n}</td><td>${row.ts}</td><td>${row.temp}</td><td>${row.dist}</td>`;
+  document.getElementById('rows').prepend(tr);
+  document.getElementById('status').textContent = `Logging… ${data.length} readings captured.`;
+}
+
+document.getElementById('startLog').addEventListener('click', ()=>{
+  if(logging) return;
+  logging = true;
+  const ms = Math.max(200, parseInt(document.getElementById('interval').value)||1000);
+  timer = setInterval(tick, ms);
+  document.getElementById('status').textContent = 'Logging started.';
+});
+document.getElementById('stopLog').addEventListener('click', ()=>{
+  logging = false; clearInterval(timer);
+  document.getElementById('status').textContent = `Stopped. ${data.length} readings captured.`;
+});
+document.getElementById('clearLog').addEventListener('click', ()=>{
+  data = []; document.getElementById('rows').innerHTML=''; document.getElementById('status').textContent='Cleared.';
+});
+document.getElementById('download').addEventListener('click', ()=>{
+  if(data.length===0){ alert('No data logged yet.'); return; }
+  const header = 'n,timestamp,temp_c,distance_cm\n';
+  const csv = header + data.map(r=>`${r.n},${r.ts},${r.temp},${r.dist}`).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sensor_log.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body></html>
