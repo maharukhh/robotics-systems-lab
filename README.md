@@ -18,13 +18,6 @@ Robotics work spans multiple layers — the algorithms that plan and control a r
 | [Boids Flocking Simulation] | Swarm robotics, multi-agent systems, emergent behavior |
 
 
-Both are runnable standalone via:
-```bash
-python robotics_applications.py --task path_planning
-python robotics_applications.py --task pid_control
-```
-Each generates a saved visualization (`astar_path.png`, `pid_tracking.png`) and displays it interactively.
-
 ### Web Simulators — Interactive Visualization
 
 | Project | Key Concepts |
